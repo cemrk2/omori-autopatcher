@@ -1,0 +1,7 @@
+﻿# Rider
+.idea
+
+omori-autopatcher/bin
+omori-autopatcher/obj
+libomori-autopatcher/x64
+libomori-autopatcher/Debug

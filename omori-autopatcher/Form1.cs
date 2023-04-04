@@ -16,5 +16,10 @@ namespace omori_autopatcher
         {
             InitializeComponent();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Utils.LoadDLL();
+        }
     }
 }

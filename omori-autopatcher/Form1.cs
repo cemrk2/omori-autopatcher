@@ -6,25 +6,25 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using MaterialSkin;
+using MaterialSkin.Controls;
 using PeNet;
 using PeNet.Header.Pe;
 
 namespace omori_autopatcher
 {
-    public partial class Form1 : Form
+    public partial class Form1 : MaterialForm
     {
         private Server _server = new Server();
+        private MaterialSkinManager _skinManager;
+        private static Color textColor = Color.Black;
 
         public Form1()
         {
             InitializeComponent();
-            statusLbl.ForeColor = Color.White;
-            this.patchBtn.ForeColor = Color.White;
-            this.dumpBtn.ForeColor = Color.White;
-            this.dumpExeBtn.ForeColor = Color.White;
-            this.unpatchBtn.ForeColor = Color.White;
-            this.BackColor = Color.FromArgb(255, 31, 31, 31);
-            this.progressBar.Hide();
+            _skinManager = MaterialSkinManager.Instance;
+            _skinManager.EnforceBackcolorOnAllComponents = true;
+            // _skinManager.Theme = MaterialSkinManager.Themes.DARK;
         }
 
         private void CopyFiles(string outputDir, string chowdrenPath)
@@ -52,80 +52,7 @@ namespace omori_autopatcher
             }
         }
 
-        private void DumpExecutable(string exePath)
-        {
-            progressBar.Invoke(new MethodInvoker(delegate
-            {
-                progressBar.Value = 0;
-                progressBar.Show(); 
-            }));
-            statusLbl.Invoke(new MethodInvoker(delegate
-            {
-                statusLbl.ForeColor = Color.White;
-                statusLbl.Text = @"Attaching DLL to Chowdren process";
-            }));
-
-            Process chowdrenProcess;
-            try
-            {
-                Utils.LoadDLL(out chowdrenProcess);
-            }
-            catch (Exception ex)
-            {
-                statusLbl.Invoke(new MethodInvoker(delegate
-                {
-                    statusLbl.ForeColor = Color.Red;
-                    statusLbl.Text = ex.Message;
-                }));
-                
-                return;
-            }
-            
-            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 33; }));
-            statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = @"Waiting for connection..."; }));
-
-            if (!_server.WaitForConnection(10000))
-            {
-                statusLbl.Invoke(new MethodInvoker(delegate
-                {
-                    statusLbl.ForeColor = Color.Red;
-                    statusLbl.Text = @"Failed to attach. Client timed out.";
-                }));
-                
-                return;
-            }
-            
-            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 66; }));
-            statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = @"Decrypting Chowdren.exe..."; }));
-
-            if (!_server.Decrypt("Chowdren.exe", exePath))
-            {
-                statusLbl.Invoke(new MethodInvoker(delegate
-                {
-                    statusLbl.ForeColor = Color.Red;
-                    statusLbl.Text = @"Failed to decrypt Chowdren.exe";
-                }));
-                
-                return;
-            }
-
-            try
-            {
-                chowdrenProcess.Kill();
-            }
-            catch (Exception ignored)
-            {
-                // ignored
-            }
-            
-            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 100; }));
-            statusLbl.Invoke(new MethodInvoker(delegate
-            {
-                statusLbl.ForeColor = Color.Lime;
-                statusLbl.Text = @"Game dumped successfully!";
-            }));
-        }
-
+        
         private void DumpGame(string outputDir)
         {
             if (outputDir.EndsWith("\\")) outputDir = outputDir.Substring(0, outputDir.Length - 1);
@@ -137,7 +64,7 @@ namespace omori_autopatcher
             }));
             statusLbl.Invoke(new MethodInvoker(delegate
             {
-                statusLbl.ForeColor = Color.White;
+                statusLbl.ForeColor = textColor;
                 statusLbl.Text = @"Attaching DLL to Chowdren process";
             }));
             Process chowdrenProcess;
@@ -231,7 +158,7 @@ namespace omori_autopatcher
             MessageBox.Show(@"Game successfully dumped!", @"OMORI AutoPatcher", MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }
-
+        
         private void dumpBtn_Click(object sender, EventArgs e)
         {
             var fbd = new FolderBrowserDialog();
@@ -243,11 +170,85 @@ namespace omori_autopatcher
                 DumpGame(fbd.SelectedPath);
             }).Start();
         }
+        
+        private void DumpExecutable(string exePath)
+        {
+            progressBar.Invoke(new MethodInvoker(delegate
+            {
+                progressBar.Value = 0;
+                progressBar.Show(); 
+            }));
+            statusLbl.Invoke(new MethodInvoker(delegate
+            {
+                statusLbl.ForeColor = textColor;
+                statusLbl.Text = @"Attaching DLL to Chowdren process";
+            }));
+
+            Process chowdrenProcess;
+            try
+            {
+                Utils.LoadDLL(out chowdrenProcess);
+            }
+            catch (Exception ex)
+            {
+                statusLbl.Invoke(new MethodInvoker(delegate
+                {
+                    statusLbl.ForeColor = Color.Red;
+                    statusLbl.Text = ex.Message;
+                }));
+                
+                return;
+            }
+            
+            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 33; }));
+            statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = @"Waiting for connection..."; }));
+
+            if (!_server.WaitForConnection(10000))
+            {
+                statusLbl.Invoke(new MethodInvoker(delegate
+                {
+                    statusLbl.ForeColor = Color.Red;
+                    statusLbl.Text = @"Failed to attach. Client timed out.";
+                }));
+                
+                return;
+            }
+            
+            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 66; }));
+            statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = @"Decrypting Chowdren.exe..."; }));
+
+            if (!_server.Decrypt("Chowdren.exe", exePath))
+            {
+                statusLbl.Invoke(new MethodInvoker(delegate
+                {
+                    statusLbl.ForeColor = Color.Red;
+                    statusLbl.Text = @"Failed to decrypt Chowdren.exe";
+                }));
+                
+                return;
+            }
+
+            try
+            {
+                chowdrenProcess.Kill();
+            }
+            catch (Exception ignored)
+            {
+                // ignored
+            }
+            
+            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 100; }));
+            statusLbl.Invoke(new MethodInvoker(delegate
+            {
+                statusLbl.ForeColor = Color.Lime;
+                statusLbl.Text = @"Game dumped successfully!";
+            }));
+        }
 
         private void dumpExeBtn_Click(object sender, EventArgs e)
         {
             var sfd = new SaveFileDialog();
-            sfd.Filter = "Portable Executable Files | *.exe";
+            sfd.Filter = @"Portable Executable Files | *.exe";
             var result = sfd.ShowDialog();
             if (result != DialogResult.OK || string.IsNullOrWhiteSpace(sfd.FileName)) return;
 
@@ -266,7 +267,7 @@ namespace omori_autopatcher
             }));
             statusLbl.Invoke(new MethodInvoker(delegate
             {
-                statusLbl.ForeColor = Color.White;
+                statusLbl.ForeColor = textColor;
                 statusLbl.Text = @"Fetching releases info from the github api";
             }));
 
@@ -350,7 +351,7 @@ Total patch count: {patchC}", @"Warning!", MessageBoxButtons.OK, MessageBoxIcon.
             }));
             statusLbl.Invoke(new MethodInvoker(delegate
             {
-                statusLbl.ForeColor = Color.White;
+                statusLbl.ForeColor = textColor;
                 statusLbl.Text = @"Checking which files need to be deleted";
             }));
 
@@ -405,6 +406,11 @@ Total patch count: {patchC}", @"Warning!", MessageBoxButtons.OK, MessageBoxIcon.
         {
             // Exit not so gracefully
             Environment.Exit(0);
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            statusLbl.ForeColor = textColor;
         }
     }
 }

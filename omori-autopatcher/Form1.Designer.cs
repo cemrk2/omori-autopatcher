@@ -29,99 +29,151 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.dumpBtn = new System.Windows.Forms.Button();
             this.statusLbl = new System.Windows.Forms.Label();
-            this.progressBar = new System.Windows.Forms.ProgressBar();
-            this.dumpExeBtn = new System.Windows.Forms.Button();
-            this.patchBtn = new System.Windows.Forms.Button();
-            this.unpatchBtn = new System.Windows.Forms.Button();
+            this.dumpExeBtn = new MaterialSkin.Controls.MaterialButton();
+            this.dumpBtn = new MaterialSkin.Controls.MaterialButton();
+            this.patchBtn = new MaterialSkin.Controls.MaterialButton();
+            this.unpatchBtn = new MaterialSkin.Controls.MaterialButton();
+            this.progressBar = new MaterialSkin.Controls.MaterialProgressBar();
             this.SuspendLayout();
-            // 
-            // dumpBtn
-            // 
-            this.dumpBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.dumpBtn.Location = new System.Drawing.Point(280, 12);
-            this.dumpBtn.Name = "dumpBtn";
-            this.dumpBtn.Size = new System.Drawing.Size(107, 29);
-            this.dumpBtn.TabIndex = 0;
-            this.dumpBtn.Text = "Dump Game";
-            this.dumpBtn.UseVisualStyleBackColor = true;
-            this.dumpBtn.Click += new System.EventHandler(this.dumpBtn_Click);
             // 
             // statusLbl
             // 
-            this.statusLbl.Location = new System.Drawing.Point(12, 76);
+            this.statusLbl.Location = new System.Drawing.Point(0, 74);
+            this.statusLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.statusLbl.Name = "statusLbl";
-            this.statusLbl.Size = new System.Drawing.Size(683, 36);
+            this.statusLbl.Size = new System.Drawing.Size(551, 29);
             this.statusLbl.TabIndex = 4;
-            // 
-            // progressBar
-            // 
-            this.progressBar.Location = new System.Drawing.Point(12, 50);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(683, 23);
-            this.progressBar.TabIndex = 3;
             // 
             // dumpExeBtn
             // 
-            this.dumpExeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.dumpExeBtn.Location = new System.Drawing.Point(128, 12);
+            this.dumpExeBtn.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.dumpExeBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.dumpExeBtn.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.dumpExeBtn.Depth = 0;
+            this.dumpExeBtn.HighEmphasis = true;
+            this.dumpExeBtn.Icon = null;
+            this.dumpExeBtn.Location = new System.Drawing.Point(5, 108);
+            this.dumpExeBtn.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.dumpExeBtn.MouseState = MaterialSkin.MouseState.HOVER;
             this.dumpExeBtn.Name = "dumpExeBtn";
-            this.dumpExeBtn.Size = new System.Drawing.Size(146, 29);
-            this.dumpExeBtn.TabIndex = 5;
+            this.dumpExeBtn.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.dumpExeBtn.Size = new System.Drawing.Size(156, 36);
+            this.dumpExeBtn.TabIndex = 8;
             this.dumpExeBtn.Text = "Dump Executable";
-            this.dumpExeBtn.UseVisualStyleBackColor = true;
+            this.dumpExeBtn.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.dumpExeBtn.UseAccentColor = false;
+            this.dumpExeBtn.UseVisualStyleBackColor = false;
             this.dumpExeBtn.Click += new System.EventHandler(this.dumpExeBtn_Click);
+            // 
+            // dumpBtn
+            // 
+            this.dumpBtn.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.dumpBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.dumpBtn.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.dumpBtn.Depth = 0;
+            this.dumpBtn.HighEmphasis = true;
+            this.dumpBtn.Icon = null;
+            this.dumpBtn.Location = new System.Drawing.Point(170, 108);
+            this.dumpBtn.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.dumpBtn.MouseState = MaterialSkin.MouseState.HOVER;
+            this.dumpBtn.Name = "dumpBtn";
+            this.dumpBtn.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.dumpBtn.Size = new System.Drawing.Size(108, 36);
+            this.dumpBtn.TabIndex = 9;
+            this.dumpBtn.Text = "Dump Game";
+            this.dumpBtn.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.dumpBtn.UseAccentColor = false;
+            this.dumpBtn.UseVisualStyleBackColor = false;
+            this.dumpBtn.Click += new System.EventHandler(this.dumpBtn_Click);
             // 
             // patchBtn
             // 
-            this.patchBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.patchBtn.Location = new System.Drawing.Point(393, 12);
+            this.patchBtn.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.patchBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.patchBtn.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.patchBtn.Depth = 0;
+            this.patchBtn.HighEmphasis = true;
+            this.patchBtn.Icon = null;
+            this.patchBtn.Location = new System.Drawing.Point(287, 108);
+            this.patchBtn.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.patchBtn.MouseState = MaterialSkin.MouseState.HOVER;
             this.patchBtn.Name = "patchBtn";
-            this.patchBtn.Size = new System.Drawing.Size(107, 29);
-            this.patchBtn.TabIndex = 6;
+            this.patchBtn.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.patchBtn.Size = new System.Drawing.Size(114, 36);
+            this.patchBtn.TabIndex = 10;
             this.patchBtn.Text = "Patch Game";
-            this.patchBtn.UseVisualStyleBackColor = true;
+            this.patchBtn.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.patchBtn.UseAccentColor = false;
+            this.patchBtn.UseVisualStyleBackColor = false;
             this.patchBtn.Click += new System.EventHandler(this.patchBtn_Click);
             // 
             // unpatchBtn
             // 
-            this.unpatchBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.unpatchBtn.Location = new System.Drawing.Point(506, 12);
+            this.unpatchBtn.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.unpatchBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.unpatchBtn.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.unpatchBtn.Depth = 0;
+            this.unpatchBtn.HighEmphasis = true;
+            this.unpatchBtn.Icon = null;
+            this.unpatchBtn.Location = new System.Drawing.Point(410, 108);
+            this.unpatchBtn.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.unpatchBtn.MouseState = MaterialSkin.MouseState.HOVER;
             this.unpatchBtn.Name = "unpatchBtn";
-            this.unpatchBtn.Size = new System.Drawing.Size(107, 29);
-            this.unpatchBtn.TabIndex = 7;
+            this.unpatchBtn.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.unpatchBtn.Size = new System.Drawing.Size(134, 36);
+            this.unpatchBtn.TabIndex = 11;
             this.unpatchBtn.Text = "Unpatch Game";
-            this.unpatchBtn.UseVisualStyleBackColor = true;
+            this.unpatchBtn.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.unpatchBtn.UseAccentColor = false;
+            this.unpatchBtn.UseVisualStyleBackColor = false;
             this.unpatchBtn.Click += new System.EventHandler(this.unpatchBtn_Click);
+            // 
+            // progressBar
+            // 
+            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar.Depth = 0;
+            this.progressBar.Location = new System.Drawing.Point(-2, 67);
+            this.progressBar.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.progressBar.MouseState = MaterialSkin.MouseState.HOVER;
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(553, 5);
+            this.progressBar.TabIndex = 12;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(707, 118);
+            this.ClientSize = new System.Drawing.Size(549, 154);
+            this.Controls.Add(this.progressBar);
             this.Controls.Add(this.unpatchBtn);
             this.Controls.Add(this.patchBtn);
+            this.Controls.Add(this.dumpBtn);
             this.Controls.Add(this.dumpExeBtn);
             this.Controls.Add(this.statusLbl);
-            this.Controls.Add(this.progressBar);
-            this.Controls.Add(this.dumpBtn);
             this.Location = new System.Drawing.Point(15, 15);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Form1";
+            this.Padding = new System.Windows.Forms.Padding(2, 52, 2, 2);
+            this.Text = "OMORI AutoPatcher";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
-        private System.Windows.Forms.Button unpatchBtn;
+        private MaterialSkin.Controls.MaterialProgressBar progressBar;
 
-        private System.Windows.Forms.Button dumpExeBtn;
-        private System.Windows.Forms.Button patchBtn;
+        private MaterialSkin.Controls.MaterialButton dumpBtn;
+        private MaterialSkin.Controls.MaterialButton patchBtn;
+        private MaterialSkin.Controls.MaterialButton unpatchBtn;
+
+        private MaterialSkin.Controls.MaterialButton dumpExeBtn;
 
         private System.Windows.Forms.Label statusLbl;
-        private System.Windows.Forms.ProgressBar progressBar;
-
-        private System.Windows.Forms.Button dumpBtn;
 
         #endregion
     }

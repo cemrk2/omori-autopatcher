@@ -103,20 +103,26 @@ namespace omori_autopatcher
             IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress,
             IntPtr lpParameter, uint dwCreationFlags, out IntPtr lpThreadId);
         
-        internal static void LoadDLL()
+        internal static void LoadDLL(out Process oProcess)
         {
             var processes = Process.GetProcesses();
+            var processFound = false;
+            Process target = null;
             foreach (var process in processes)
             {
                 var dllPath = Path.GetFullPath("libomori-autopatcher.dll");
+#if DEBUG
+                if (File.Exists(@"../../../../x64/Debug/libomori-autopatcher.dll"))
+                    dllPath = Path.GetFullPath(@"../../../../x64/Debug/libomori-autopatcher.dll");
+#endif
                 if (process.ProcessName != "Chowdren") continue;
+                processFound = true;
+                target = process;
                 
                 var handle = OpenProcess(process, ProcessAccessFlags.All);
                 if (handle == INVALID_HANDLE_VALUE)
                 {
-                    MessageBox.Show(@"Failed to open handle to OMORI", @"Error", MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    return;
+                    throw new Exception("Attaching failed. Failed to open handle to Chowdren.exe");
                 }
                 
                 Debug.Print("handle: {0:D}", handle);
@@ -126,14 +132,12 @@ namespace omori_autopatcher
 
                 if (address == IntPtr.Zero)
                 {
-                    MessageBox.Show(@"Failed to allocate buffer", @"Error", MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    return;
+                    throw new Exception("Attaching failed. Failed to allocate buffer inside Chowdren process");
                 }
                 
                 Debug.Print("VirtualAllocEx: 0x{0:X}", address);
 
-                var termPath = new List<byte>(Encoding.UTF8.GetBytes(dllPath)) { 0 };
+                var termPath = new List<byte>(Encoding.ASCII.GetBytes(dllPath)) { 0 };
                 WriteProcessMemory(handle, address, termPath.ToArray(), termPath.Count,
                     out var bytesWritten);
                 
@@ -142,9 +146,7 @@ namespace omori_autopatcher
                 var kernel32 = GetModuleHandle("kernel32.dll");
                 if (kernel32 == INVALID_HANDLE_VALUE)
                 {
-                    MessageBox.Show(@"Failed to get handle to kernel32.dll", @"Error", MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    return;
+                    throw new Exception("Attaching failed. Failed to get handle to kernel32.dll");
                 }
                 
                 Debug.Print("kernel32.dll handle: 0x{0:X}", kernel32.ToInt64());
@@ -152,9 +154,7 @@ namespace omori_autopatcher
                 var loadLibraryA = GetProcAddress(kernel32, "LoadLibraryA");
                 if (loadLibraryA == IntPtr.Zero)
                 {
-                    MessageBox.Show(@"Failed to get address of LoadLibraryA", @"Error", MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    return;
+                    throw new Exception("Attaching failed. Failed to get address of LoadLibraryA");
                 }
                 
                 Debug.Print("LoadLibraryA: 0x{0:X}", loadLibraryA.ToInt64());
@@ -162,17 +162,47 @@ namespace omori_autopatcher
                 var threadHandle = CreateRemoteThread(handle, IntPtr.Zero, 0, loadLibraryA, address, 0, out var threadId);
                 if (threadHandle == INVALID_HANDLE_VALUE)
                 {
-                    MessageBox.Show(@"Failed to create remote thread inside OMORI", @"Error", MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    return;
+                    throw new Exception("Attaching failed. Failed to spawn remote thread inside Chowdren process");
                 }
                 
                 Debug.Print("CreateRemoteThread: handle={0:D}, threadId={1:D}", threadHandle.ToInt64(), threadId.ToInt64());
 
                 CloseHandle(handle);
-
             }
+
+            if (!processFound)
+            {
+                throw new Exception("Failed to find Chowdren process");
+            }
+            oProcess = target;
         }
         
+        public static IEnumerable<string> GetFiles(string path) {
+            Queue<string> queue = new Queue<string>();
+            queue.Enqueue(path);
+            while (queue.Count > 0) {
+                path = queue.Dequeue();
+                try {
+                    foreach (string subDir in Directory.GetDirectories(path)) {
+                        queue.Enqueue(subDir);
+                    }
+                }
+                catch(Exception ex) {
+                    Console.Error.WriteLine(ex);
+                }
+                string[] files = null;
+                try {
+                    files = Directory.GetFiles(path);
+                }
+                catch (Exception ex) {
+                    Console.Error.WriteLine(ex);
+                }
+                if (files != null) {
+                    for(int i = 0 ; i < files.Length ; i++) {
+                        yield return files[i];
+                    }
+                }
+            }
+        }
     }
 }

@@ -29,31 +29,82 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
+            this.dumpBtn = new System.Windows.Forms.Button();
+            this.statusLbl = new System.Windows.Forms.Label();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
+            this.dumpExeBtn = new System.Windows.Forms.Button();
+            this.patchBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // button1
+            // dumpBtn
             // 
-            this.button1.Location = new System.Drawing.Point(258, 201);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Patch";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.dumpBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.dumpBtn.Location = new System.Drawing.Point(345, 12);
+            this.dumpBtn.Name = "dumpBtn";
+            this.dumpBtn.Size = new System.Drawing.Size(107, 29);
+            this.dumpBtn.TabIndex = 0;
+            this.dumpBtn.Text = "Dump Game";
+            this.dumpBtn.UseVisualStyleBackColor = true;
+            this.dumpBtn.Click += new System.EventHandler(this.dumpBtn_Click);
+            // 
+            // statusLbl
+            // 
+            this.statusLbl.Location = new System.Drawing.Point(12, 76);
+            this.statusLbl.Name = "statusLbl";
+            this.statusLbl.Size = new System.Drawing.Size(683, 36);
+            this.statusLbl.TabIndex = 4;
+            // 
+            // progressBar
+            // 
+            this.progressBar.Location = new System.Drawing.Point(12, 50);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(683, 23);
+            this.progressBar.TabIndex = 3;
+            // 
+            // dumpExeBtn
+            // 
+            this.dumpExeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.dumpExeBtn.Location = new System.Drawing.Point(193, 12);
+            this.dumpExeBtn.Name = "dumpExeBtn";
+            this.dumpExeBtn.Size = new System.Drawing.Size(146, 29);
+            this.dumpExeBtn.TabIndex = 5;
+            this.dumpExeBtn.Text = "Dump Executable";
+            this.dumpExeBtn.UseVisualStyleBackColor = true;
+            // 
+            // patchBtn
+            // 
+            this.patchBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.patchBtn.Location = new System.Drawing.Point(458, 12);
+            this.patchBtn.Name = "patchBtn";
+            this.patchBtn.Size = new System.Drawing.Size(107, 29);
+            this.patchBtn.TabIndex = 6;
+            this.patchBtn.Text = "Patch Game";
+            this.patchBtn.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(561, 236);
-            this.Controls.Add(this.button1);
+            this.BackColor = System.Drawing.SystemColors.Control;
+            this.ClientSize = new System.Drawing.Size(707, 118);
+            this.Controls.Add(this.patchBtn);
+            this.Controls.Add(this.dumpExeBtn);
+            this.Controls.Add(this.statusLbl);
+            this.Controls.Add(this.progressBar);
+            this.Controls.Add(this.dumpBtn);
+            this.Location = new System.Drawing.Point(15, 15);
             this.Name = "Form1";
-            this.Text = "OMORI AutoPatcher";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.ResumeLayout(false);
         }
 
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button dumpExeBtn;
+        private System.Windows.Forms.Button patchBtn;
+
+        private System.Windows.Forms.Label statusLbl;
+        private System.Windows.Forms.ProgressBar progressBar;
+
+        private System.Windows.Forms.Button dumpBtn;
 
         #endregion
     }

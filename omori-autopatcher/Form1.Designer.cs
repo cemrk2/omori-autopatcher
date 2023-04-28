@@ -34,12 +34,13 @@
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.dumpExeBtn = new System.Windows.Forms.Button();
             this.patchBtn = new System.Windows.Forms.Button();
+            this.unpatchBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // dumpBtn
             // 
             this.dumpBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.dumpBtn.Location = new System.Drawing.Point(345, 12);
+            this.dumpBtn.Location = new System.Drawing.Point(280, 12);
             this.dumpBtn.Name = "dumpBtn";
             this.dumpBtn.Size = new System.Drawing.Size(107, 29);
             this.dumpBtn.TabIndex = 0;
@@ -64,7 +65,7 @@
             // dumpExeBtn
             // 
             this.dumpExeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.dumpExeBtn.Location = new System.Drawing.Point(193, 12);
+            this.dumpExeBtn.Location = new System.Drawing.Point(128, 12);
             this.dumpExeBtn.Name = "dumpExeBtn";
             this.dumpExeBtn.Size = new System.Drawing.Size(146, 29);
             this.dumpExeBtn.TabIndex = 5;
@@ -75,7 +76,7 @@
             // patchBtn
             // 
             this.patchBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.patchBtn.Location = new System.Drawing.Point(458, 12);
+            this.patchBtn.Location = new System.Drawing.Point(393, 12);
             this.patchBtn.Name = "patchBtn";
             this.patchBtn.Size = new System.Drawing.Size(107, 29);
             this.patchBtn.TabIndex = 6;
@@ -83,12 +84,24 @@
             this.patchBtn.UseVisualStyleBackColor = true;
             this.patchBtn.Click += new System.EventHandler(this.patchBtn_Click);
             // 
+            // unpatchBtn
+            // 
+            this.unpatchBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.unpatchBtn.Location = new System.Drawing.Point(506, 12);
+            this.unpatchBtn.Name = "unpatchBtn";
+            this.unpatchBtn.Size = new System.Drawing.Size(107, 29);
+            this.unpatchBtn.TabIndex = 7;
+            this.unpatchBtn.Text = "Unpatch Game";
+            this.unpatchBtn.UseVisualStyleBackColor = true;
+            this.unpatchBtn.Click += new System.EventHandler(this.unpatchBtn_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(707, 118);
+            this.Controls.Add(this.unpatchBtn);
             this.Controls.Add(this.patchBtn);
             this.Controls.Add(this.dumpExeBtn);
             this.Controls.Add(this.statusLbl);
@@ -99,6 +112,8 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.Button unpatchBtn;
 
         private System.Windows.Forms.Button dumpExeBtn;
         private System.Windows.Forms.Button patchBtn;

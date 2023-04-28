@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using PeNet;
@@ -21,6 +22,7 @@ namespace omori_autopatcher
             this.patchBtn.ForeColor = Color.White;
             this.dumpBtn.ForeColor = Color.White;
             this.dumpExeBtn.ForeColor = Color.White;
+            this.unpatchBtn.ForeColor = Color.White;
             this.BackColor = Color.FromArgb(255, 31, 31, 31);
             this.progressBar.Hide();
         }
@@ -255,18 +257,6 @@ namespace omori_autopatcher
             }).Start();
         }
 
-        private void patchBtn_Click(object sender, EventArgs e)
-        {
-            var fbd = new FolderBrowserDialog();
-            var result = fbd.ShowDialog();
-            if (result != DialogResult.OK || string.IsNullOrWhiteSpace(fbd.SelectedPath)) return;
-
-            new Thread(() =>
-            {
-                PatchGame(fbd.SelectedPath);
-            }).Start();
-        }
-
         private void PatchGame(string dir)
         {
             progressBar.Invoke(new MethodInvoker(delegate
@@ -332,10 +322,83 @@ Total patch count: {patchC}", @"Warning!", MessageBoxButtons.OK, MessageBoxIcon.
             progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 90; }));
             File.WriteAllBytes(dir + "\\OMORI.exe", rawBytes);
             
-            statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = @"Writing patched executable to disk..."; }));
+            statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = @"OMORI Successfully patched!"; }));
+            statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.ForeColor = Color.Lime; }));
             progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 100; }));
             MessageBox.Show(
                 @"OMORI has been patched successfully! To launch the patched version of OMORI, run ""OMORI.exe"", to launch the unpatched version of OMORI, run ""Chowdren.exe""", @"OMORI AutoPatcher", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void patchBtn_Click(object sender, EventArgs e)
+        {
+            var fbd = new FolderBrowserDialog();
+            var result = fbd.ShowDialog();
+            if (result != DialogResult.OK || string.IsNullOrWhiteSpace(fbd.SelectedPath)) return;
+
+            new Thread(() =>
+            {
+                PatchGame(fbd.SelectedPath);
+            }).Start();
+        }
+
+        void UnpatchGame(string dir)
+        {
+            progressBar.Invoke(new MethodInvoker(delegate
+            {
+                progressBar.Value = 0;
+                progressBar.Show(); 
+            }));
+            statusLbl.Invoke(new MethodInvoker(delegate
+            {
+                statusLbl.ForeColor = Color.White;
+                statusLbl.Text = @"Checking which files need to be deleted";
+            }));
+
+            if (!File.Exists(dir + "\\uninst.txt"))
+            {
+                MessageBox.Show(
+                    @"Failed to find instructions for unpatching the game, if you want to unpatch it you are going to have to do it manually",
+                    @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var uninst = File.ReadAllText(dir + "\\uninst.txt");
+            var split = Regex.Split(uninst, "\r\n|\r|\n");
+            for (int i = 0; i < split.Length; i++)
+            {
+                var file = split[i];
+
+                try
+                {
+                    File.Delete(dir + "\\" + file);
+                }
+                catch (Exception ignored)
+                {
+                    // ignored
+                }
+                progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = (int) (i+1f/split.Length*100f); }));
+                statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = $@"Deleting {file}"; }));
+            }
+
+            File.Delete(dir + "\\uninst.txt");
+            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 100; }));
+            statusLbl.Invoke(new MethodInvoker(delegate
+            {
+                statusLbl.ForeColor = Color.Lime;
+                statusLbl.Text = @"ModLoader uninstalled successfully";
+            }));
+        }
+
+        private void unpatchBtn_Click(object sender, EventArgs e)
+        {
+            var fbd = new FolderBrowserDialog();
+            var result = fbd.ShowDialog();
+            if (result != DialogResult.OK || string.IsNullOrWhiteSpace(fbd.SelectedPath)) return;
+
+            new Thread(() =>
+            {
+                UnpatchGame(fbd.SelectedPath);
+            }).Start();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

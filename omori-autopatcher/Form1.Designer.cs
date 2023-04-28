@@ -81,6 +81,7 @@
             this.patchBtn.TabIndex = 6;
             this.patchBtn.Text = "Patch Game";
             this.patchBtn.UseVisualStyleBackColor = true;
+            this.patchBtn.Click += new System.EventHandler(this.patchBtn_Click);
             // 
             // Form1
             // 

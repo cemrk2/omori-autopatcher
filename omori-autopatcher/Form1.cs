@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using PeNet;
+using PeNet.Header.Pe;
 
 namespace omori_autopatcher
 {
@@ -50,7 +52,6 @@ namespace omori_autopatcher
 
         private void DumpExecutable(string exePath)
         {
-            MessageBox.Show(exePath);
             progressBar.Invoke(new MethodInvoker(delegate
             {
                 progressBar.Value = 0;
@@ -252,6 +253,89 @@ namespace omori_autopatcher
             {
                 DumpExecutable(sfd.FileName);
             }).Start();
+        }
+
+        private void patchBtn_Click(object sender, EventArgs e)
+        {
+            var fbd = new FolderBrowserDialog();
+            var result = fbd.ShowDialog();
+            if (result != DialogResult.OK || string.IsNullOrWhiteSpace(fbd.SelectedPath)) return;
+
+            new Thread(() =>
+            {
+                PatchGame(fbd.SelectedPath);
+            }).Start();
+        }
+
+        private void PatchGame(string dir)
+        {
+            progressBar.Invoke(new MethodInvoker(delegate
+            {
+                progressBar.Value = 0;
+                progressBar.Show(); 
+            }));
+            statusLbl.Invoke(new MethodInvoker(delegate
+            {
+                statusLbl.ForeColor = Color.White;
+                statusLbl.Text = @"Fetching releases info from the github api";
+            }));
+
+            var hash = Utils.Sha256CheckSum(dir + "\\Chowdren.exe");
+
+            var releaseId = Utils.GetLatestReleaseId("cemrk2/omori-patcher");
+            Debug.Print("Latest release id: {0:D}", releaseId);
+            var releaseInfo = Utils.GetReleaseInfo("cemrk2/omori-patcher", releaseId);
+            var assetInfo = Utils.GetAssetInfo("cemrk2/omori-patcher", releaseId);
+            var tagName = (string)releaseInfo["tag_name"];
+            var gameSha = (string)releaseInfo["body"];
+            var uninstInfo = "OMORI.exe\n";
+            gameSha = gameSha.Split(new string[] { "Chowdren.exe SHA-256: \"" }, StringSplitOptions.None)[1].Split('"')[0];
+
+            if (hash != gameSha)
+            {
+                MessageBox.Show($@"Your version of OMORI {hash} doesn't seem to match with the latest support version {gameSha}", @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            
+            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 10; }));
+            for (var i = 0; i < assetInfo.Count; i++)
+            {
+                var asset = assetInfo[i];
+                statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = $@"({i+1}/{assetInfo.Count}) Downloading {asset["name"]}"; }));
+                progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = (int) (10+(i+1f)/assetInfo.Count*60); }));
+
+                uninstInfo += $"{asset["name"]}\n";
+                File.WriteAllBytes(dir + "\\" + asset["name"], Utils.GetBytes((string) asset["browser_download_url"]));
+            }
+            
+            File.WriteAllText(dir + "\\uninst.txt", uninstInfo);
+
+            statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = @"Removing Dynamic Base header"; }));
+            var peFile = new PeFile(dir + "\\Chowdren.exe");
+            if (peFile.ImageNtHeaders.OptionalHeader.DllCharacteristics.HasFlag(DllCharacteristicsType.DynamicBase))
+                peFile.ImageNtHeaders.OptionalHeader.DllCharacteristics ^= DllCharacteristicsType.DynamicBase;
+
+            var rawBytes = peFile.RawFile.ToArray();
+            
+            statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = @"Applying x64dbg patch file"; }));
+            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 80; }));
+
+            var (appliedPatches, patchC) = Utils.Apply1337Patch(File.ReadAllText(dir + "\\ChowdrenNoDyB.1337"), peFile, rawBytes);
+            if (appliedPatches.Count != patchC)
+            {
+                MessageBox.Show($@"Some patch files failed to apply to Chowdren.exe, this might cause things to break
+Applied patches: {appliedPatches}
+Total patch count: {patchC}", @"Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            
+            statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = @"Writing patched executable to disk..."; }));
+            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 90; }));
+            File.WriteAllBytes(dir + "\\OMORI.exe", rawBytes);
+            
+            statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = @"Writing patched executable to disk..."; }));
+            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 100; }));
+            MessageBox.Show(
+                @"OMORI has been patched successfully! To launch the patched version of OMORI, run ""OMORI.exe"", to launch the unpatched version of OMORI, run ""Chowdren.exe""", @"OMORI AutoPatcher", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Newtonsoft.Json.Linq;
+using PeNet;
 
 namespace omori_autopatcher
 {
@@ -203,6 +209,110 @@ namespace omori_autopatcher
                     }
                 }
             }
+        }
+        
+        public static string Sha256CheckSum(string filePath)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                using (var fileStream = File.OpenRead(filePath))
+                    return BitConverter.ToString(sha256.ComputeHash(fileStream)).Replace("-", "");
+            }
+        }
+
+        private static string Get(string url)
+        {
+            var rawContent = "";
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0";
+            request.AutomaticDecompression = DecompressionMethods.GZip;
+
+            using (var response = (HttpWebResponse)request.GetResponse())
+            using (var stream = response.GetResponseStream())
+            using (var reader = new StreamReader(stream))
+            {
+                rawContent = reader.ReadToEnd();
+            }
+
+            return rawContent;
+        }
+        
+        public static byte[] GetBytes(string url)
+        {
+            var rawContent = "";
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0";
+            request.AutomaticDecompression = DecompressionMethods.GZip;
+
+            using (var response = (HttpWebResponse)request.GetResponse())
+            using (var stream = response.GetResponseStream())
+            using(var memoryStream = new MemoryStream())
+            {
+                if (stream != null) stream.CopyTo(memoryStream);
+                return memoryStream.ToArray();
+            }
+        }
+
+        public static int GetLatestReleaseId(string repo)
+        {
+            var releases = JArray.Parse(Get($"https://api.github.com/repos/{repo}/releases"));
+
+            return releases[0]["id"].Value<int>();
+        }
+        
+        public static JObject GetReleaseInfo(string repo, int releaseId)
+        {
+            return JObject.Parse(Get($"https://api.github.com/repos/{repo}/releases/{releaseId}"));
+        }
+
+        public static JArray GetAssetInfo(string repo, int releaseId)
+        {
+            return JArray.Parse(Get($"https://api.github.com/repos/{repo}/releases/{releaseId}/assets"));
+        }
+
+        /**
+         * Applies an x64dbg patch file (.1337)
+         * Returns a list of successfully applied patches and the amount of patches
+         */
+        public static (List<int>, int) Apply1337Patch(string patch, PeFile peFile, byte[] rawBinary)
+        {
+            var appliedPatches = new List<int>();
+            int patchC = 0;
+            uint textOffset = 0x00; // offset to the .text section
+            uint memTextOffset = 0x1000; // offset to the .text section in memory
+            
+            foreach (var section in peFile.ImageSectionHeaders)
+            {
+                if (section.Name != ".text") continue;
+                textOffset = section.PointerToRawData;
+            }
+
+            var split = Regex.Split(patch, "\r\n|\r|\n");
+            for (var i = 0; i < split.Length; i++)
+            {
+                var line = split[i];
+                if (line.StartsWith(">")) continue;
+                patchC++;
+                var addrStr = line.Split(':')[0];
+                var mod = line.Split(':')[1];
+                var from = byte.Parse(mod.Substring(0, 2), NumberStyles.HexNumber);
+                var to = byte.Parse(mod.Substring(4, 2), NumberStyles.HexNumber);
+
+                var addr = uint.Parse(addrStr, NumberStyles.HexNumber) + textOffset - memTextOffset;
+                if (rawBinary[addr] == from)
+                {
+                    appliedPatches.Add(i);
+                    rawBinary[addr] = to;
+                }
+#if DEBUG
+                else
+                {
+                    Debug.Print("rawBinary[0x{0:X}] != 0x{1:X}", addr, from);
+                }
+#endif
+            }
+
+            return (appliedPatches, patchC);
         }
     }
 }

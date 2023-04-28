@@ -70,6 +70,7 @@
             this.dumpExeBtn.TabIndex = 5;
             this.dumpExeBtn.Text = "Dump Executable";
             this.dumpExeBtn.UseVisualStyleBackColor = true;
+            this.dumpExeBtn.Click += new System.EventHandler(this.dumpExeBtn_Click);
             // 
             // patchBtn
             // 

@@ -48,6 +48,81 @@ namespace omori_autopatcher
             }
         }
 
+        private void DumpExecutable(string exePath)
+        {
+            MessageBox.Show(exePath);
+            progressBar.Invoke(new MethodInvoker(delegate
+            {
+                progressBar.Value = 0;
+                progressBar.Show(); 
+            }));
+            statusLbl.Invoke(new MethodInvoker(delegate
+            {
+                statusLbl.ForeColor = Color.White;
+                statusLbl.Text = @"Attaching DLL to Chowdren process";
+            }));
+
+            Process chowdrenProcess;
+            try
+            {
+                Utils.LoadDLL(out chowdrenProcess);
+            }
+            catch (Exception ex)
+            {
+                statusLbl.Invoke(new MethodInvoker(delegate
+                {
+                    statusLbl.ForeColor = Color.Red;
+                    statusLbl.Text = ex.Message;
+                }));
+                
+                return;
+            }
+            
+            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 33; }));
+            statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = @"Waiting for connection..."; }));
+
+            if (!_server.WaitForConnection(10000))
+            {
+                statusLbl.Invoke(new MethodInvoker(delegate
+                {
+                    statusLbl.ForeColor = Color.Red;
+                    statusLbl.Text = @"Failed to attach. Client timed out.";
+                }));
+                
+                return;
+            }
+            
+            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 66; }));
+            statusLbl.Invoke(new MethodInvoker(delegate { statusLbl.Text = @"Decrypting Chowdren.exe..."; }));
+
+            if (!_server.Decrypt("Chowdren.exe", exePath))
+            {
+                statusLbl.Invoke(new MethodInvoker(delegate
+                {
+                    statusLbl.ForeColor = Color.Red;
+                    statusLbl.Text = @"Failed to decrypt Chowdren.exe";
+                }));
+                
+                return;
+            }
+
+            try
+            {
+                chowdrenProcess.Kill();
+            }
+            catch (Exception ignored)
+            {
+                // ignored
+            }
+            
+            progressBar.Invoke(new MethodInvoker(delegate { progressBar.Value = 100; }));
+            statusLbl.Invoke(new MethodInvoker(delegate
+            {
+                statusLbl.ForeColor = Color.Lime;
+                statusLbl.Text = @"Game dumped successfully!";
+            }));
+        }
+
         private void DumpGame(string outputDir)
         {
             if (outputDir.EndsWith("\\")) outputDir = outputDir.Substring(0, outputDir.Length - 1);
@@ -143,6 +218,12 @@ namespace omori_autopatcher
             {
                 // ignored
             }
+            
+            statusLbl.Invoke(new MethodInvoker(delegate
+            {
+                statusLbl.ForeColor = Color.Lime;
+                statusLbl.Text = @"Game dumped successfully!";
+            }));
 
             MessageBox.Show(@"Game successfully dumped!", @"OMORI AutoPatcher", MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
@@ -157,6 +238,19 @@ namespace omori_autopatcher
             new Thread(() =>
             {
                 DumpGame(fbd.SelectedPath);
+            }).Start();
+        }
+
+        private void dumpExeBtn_Click(object sender, EventArgs e)
+        {
+            var sfd = new SaveFileDialog();
+            sfd.Filter = "Portable Executable Files | *.exe";
+            var result = sfd.ShowDialog();
+            if (result != DialogResult.OK || string.IsNullOrWhiteSpace(sfd.FileName)) return;
+
+            new Thread(() =>
+            {
+                DumpExecutable(sfd.FileName);
             }).Start();
         }
 
